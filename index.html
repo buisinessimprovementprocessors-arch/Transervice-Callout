@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Transervice Call Out</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --red: #F5A800;
+    --dark: #F4F4F4;
+    --charcoal: #FFFFFF;
+    --panel: #FFFFFF;
+    --border: #DEDEDE;
+    --text: #1A1A1A;
+    --muted: #777777;
+    --green: #2ECC71;
+    --yellow: #F5A800;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: #4A4A4A;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 160px; height: 160px;
+    background: rgba(245,168,0,0.1);
+    border-radius: 50%;
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+  }
+  .logo-box {
+    width: 44px; height: 44px;
+    background: #F5A800;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-box svg { width: 28px; height: 28px; }
+  .header-text h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .header-text p {
+    font-size: 11px;
+    opacity: 0.8;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  /* DATE BANNER */
+  .date-banner {
+    background: #4A4A4A;
+    border-bottom: 1px solid #3A3A3A;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .date-banner span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #BBBBBB;
+    text-transform: uppercase;
+  }
+  .date-banner strong {
+    color: #F5A800;
+    font-weight: 600;
+  }
+
+  /* FORM CONTAINER */
+  .form-wrap {
+    padding: 20px 16px 40px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 14px;
+    padding-left: 2px;
+  }
+
+  .field {
+    margin-bottom: 16px;
+  }
+  .field label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+    font-weight: 500;
+  }
+  .field input,
+  .field select {
+    width: 100%;
+    background: #FFFFFF;
+    border: 1.5px solid #DEDEDE;
+    border-radius: 6px;
+    padding: 14px 16px;
+    color: #1A1A1A;
+    font-family: 'Barlow', sans-serif;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .field input:focus,
+  .field select:focus {
+    border-color: #F5A800;
+  }
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23777' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+  }
+
+  /* ID lookup result */
+  .id-result {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: rgba(46,204,113,0.1);
+    border: 1px solid rgba(46,204,113,0.3);
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--green);
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .id-result.show { display: flex; }
+  .id-result.error {
+    background: rgba(214,43,43,0.1);
+    border-color: rgba(214,43,43,0.3);
+    color: #ff6b6b;
+  }
+
+  /* REASON CARDS */
+  .reason-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .reason-card {
+    background: #FFFFFF;
+    border: 1.5px solid #DEDEDE;
+    border-radius: 8px;
+    padding: 12px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .reason-card:active { transform: scale(0.97); }
+  .reason-card.selected {
+    border-color: #F5A800;
+    background: rgba(245,168,0,0.08);
+  }
+  .reason-card .icon { font-size: 20px; margin-bottom: 5px; }
+  .reason-card .label {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+    color: #1A1A1A;
+    line-height: 1.3;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+
+  /* SUBMIT BUTTON */
+  .submit-btn {
+    width: 100%;
+    background: #F5A800;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 17px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .submit-btn:active { transform: scale(0.98); background: #D4900A; }
+  .submit-btn:disabled { background: #CCCCCC; cursor: not-allowed; }
+
+  /* SUCCESS STATE */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .success-screen.show { display: block; }
+  .success-icon {
+    width: 80px; height: 80px;
+    background: rgba(46,204,113,0.15);
+    border: 2px solid var(--green);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 36px;
+  }
+  .success-screen h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .success-screen p { color: var(--muted); font-size: 15px; margin-bottom: 30px; }
+  .new-entry-btn {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 14px 28px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  /* QR SECTION */
+  .qr-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+    margin-top: 30px;
+  }
+  .qr-section h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  #qrcode {
+    display: inline-block;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+  }
+  .qr-url {
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--muted);
+    word-break: break-all;
+  }
+
+  /* SPINNER */
+  .spinner {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #333;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: transform 0.3s;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-box">
+      <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="8" width="24" height="14" rx="3" fill="#D62B2B"/>
+        <circle cx="8" cy="22" r="3" fill="#222"/>
+        <circle cx="20" cy="22" r="3" fill="#222"/>
+        <rect x="2" y="10" width="10" height="8" rx="1" fill="white" opacity="0.3"/>
+        <path d="M4 6 L14 2 L24 6" stroke="#D62B2B" stroke-width="2" fill="none"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Transervice</h1>
+      <p>Atlanta Operations · Call Out Report</p>
+    </div>
+  </div>
+</div>
+
+<div class="date-banner">
+  <span id="today-date">Loading...</span>
+  <span><strong id="today-time">--:--</strong></span>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap" id="form-section">
+  <p class="section-label">Driver Information</p>
+
+  <div class="field">
+    <label>Employee ID #</label>
+    <input type="number" id="emp-id" placeholder="e.g. 411166" inputmode="numeric" autocomplete="off">
+    <div class="id-result" id="id-result">
+      <span>✓</span><span id="id-name"></span>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Shift Start Time</label>
+    <select id="shift-start">
+      <option value="">Select shift time...</option>
+      <option>5:30 AM</option>
+      <option>6:00 AM</option>
+      <option>7:00 AM</option>
+      <option>8:00 AM</option>
+      <option>9:00 AM</option>
+      <option>9:30 AM</option>
+      <option>10:00 AM</option>
+      <option>11:00 AM</option>
+      <option>12:00 PM</option>
+      <option>5:30 PM</option>
+      <option>6:00 PM</option>
+    </select>
+  </div>
+
+  <div class="divider"></div>
+  <p class="section-label">Reason for Call Out</p>
+
+  <div class="reason-grid">
+    <div class="reason-card" data-value="Call out/FMLA">
+      <div class="icon">🏥</div>
+      <div class="label">Call Out / FMLA</div>
+    </div>
+    <div class="reason-card" data-value="Call Out (Absent)">
+      <div class="icon">🚫</div>
+      <div class="label">Call Out (Absent)</div>
+    </div>
+    <div class="reason-card" data-value="Leave Early">
+      <div class="icon">🚪</div>
+      <div class="label">Leave Early</div>
+    </div>
+    <div class="reason-card" data-value="Late Arrival">
+      <div class="icon">⏰</div>
+      <div class="label">Late Arrival</div>
+    </div>
+    <div class="reason-card" data-value="Sick Day">
+      <div class="icon">🤒</div>
+      <div class="label">Sick Day</div>
+    </div>
+    <div class="reason-card" data-value="No Call No Show/NCNS">
+      <div class="icon">📵</div>
+      <div class="label">No Call No Show</div>
+    </div>
+    <div class="reason-card" data-value="Bereavement">
+      <div class="icon">🕊️</div>
+      <div class="label">Bereavement</div>
+    </div>
+    <div class="reason-card" data-value="Vacation Day">
+      <div class="icon">✈️</div>
+      <div class="label">Vacation Day</div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Additional Notes (Optional)</label>
+    <input type="text" id="notes" placeholder="Any additional info...">
+  </div>
+
+  <button class="submit-btn" id="submit-btn" onclick="submitForm()">
+    Submit Call Out
+  </button>
+
+  <!-- QR Code for sharing -->
+  <div class="qr-section">
+    <h3>Share This Form</h3>
+    <div id="qrcode"></div>
+    <p class="qr-url" id="qr-url-text"></p>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="success-section">
+  <div class="success-icon">✓</div>
+  <h2>Submitted!</h2>
+  <p>Your call out has been recorded.<br>The supervisor has been notified.</p>
+  <button class="new-entry-btn" onclick="resetForm()">Submit Another</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxnrjSHkGqMuMWaQBHXhZPdUkmFsgU6-gjiZGY-ypNYK_zmfLiMNF6xbfrqRDt_ecM8jA/exec";
+
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('today-date').textContent = now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+  document.getElementById('today-time').textContent = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Reason selection
+let selectedReason = '';
+document.querySelectorAll('.reason-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.reason-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedReason = card.dataset.value;
+  });
+});
+
+// Employee ID lookup
+const employeeNames = {
+  411001:"Marty Mosley",411002:"Alfred Hardy",411003:"Milton Hall",411004:"Jimmy Morris",
+  411005:"Curtis Lawrence",411006:"Scott Thompson",411008:"James Harmon",411009:"Kenneth Willis",
+  411013:"Roderick Manning",411014:"Edward Sherrill",411015:"Larry Kendrick",411016:"Von Simmons",
+  411017:"Jasper Porter",411018:"Jim Blackburn",411019:"Terry Johnson",411020:"John Tipton",
+  411022:"Benjamin Tillman",411023:"Terry Saunders",411025:"James Danny Brown",411026:"James Tinch",
+  411027:"Kristopher Carey",411028:"Dwane Landry",411030:"Dennis Morris",411032:"Brett Peace",
+  411034:"Michael Poitier",411036:"Phillip Woodley Jr.",411037:"Albert Head",411038:"Dusko Martinovic",
+  411039:"Tim Ingram",411040:"Eddie Vasquez",411042:"Spencer Williams",411043:"Malcolm Hall",
+  411045:"Todd Swift",411046:"Donnie Smith",411048:"Alfred Dumas",411049:"Dante Relaford",
+  411050:"Willie Blocker",411052:"Gregory Hamilton",411054:"Michael Mason",411056:"Jose Soria",
+  411057:"Joe Law",411058:"Joseph Duffy",411059:"Edward Gresham",411060:"Dwight Gunn",
+  411061:"Ytece Scales",411062:"Jerry Kendall",411063:"Rodriquez Ragland",411064:"Richard Chambers",
+  411065:"Jeffery Brittian",411066:"Christopher Basden",411069:"Steven Lewis",411070:"Hosel Johnson",
+  411071:"Mario Andrews",411072:"Gary Higgins",411073:"Monica McKoy",411077:"Tracy Tift",
+  411078:"Albert Ponder",411079:"Adrienne Bryant",411080:"Robert Couch",411083:"Victor Staples",
+  411086:"Eric Walker",411087:"Michael Calhoun",411088:"Joe Cook",411089:"Darrio Parrish",
+  411090:"Raphael Lucas",411091:"Christopher Hardy",411092:"Ernest McCrary",411093:"Thomas Leverett",
+  411094:"Timothy Simon",411095:"Randall Murphy",411096:"Robert Whitney",411097:"Mario Searcy",
+  411098:"Robert Farris",411100:"Leslie Kimble",411102:"David Lyons",411103:"Ralph Payton",
+  411106:"Mahmoud Rashad",411107:"Roderick Tucker",411108:"Chris Floyd",411109:"Takelia McCrimon",
+  411110:"Carl Sweat",411111:"Mark Roebuck",411112:"Darell Richson",411113:"Antwann Lewis",
+  411115:"Jean Louis",411116:"Rontavious Patton",411118:"Zacarra Buffington",411121:"John Wesley Yates",
+  411122:"Gene Thompson",411123:"Elom Maglo",411124:"Rodney Bembry",411126:"Alexander Rhodes",
+  411127:"Robert Brewer",411131:"Divid Harris",411133:"Mackenzie Nelson",411134:"Richardson Fils",
+  411135:"Kendall Thomas",411138:"Scott Blankenship",411139:"Jason Hooks",411140:"Laracco Glaze",
+  411141:"Samuel Meeks",411142:"Kenneth Sheriff",411144:"Davon Autry",411146:"Reginald Smith",
+  411149:"Joseph Robinson",411150:"Deion Coston",411151:"Raven Scott",411154:"Kelvyn Corbett",
+  411155:"Bruce Reavis",411156:"Gerald Greene",411157:"Staffon Myers",411159:"Leslie Lawrence",
+  411160:"Marcus Lewis",411161:"Wilson Reid",411162:"Larry Tanksley",411163:"Robert Cureton",
+  411165:"Lonnie Gary",411166:"Bryant Dennis",411167:"Alfred Hill",411168:"Ulysses Gladden",
+  411169:"Kizzy Morris",411170:"Louis Washington",411171:"Louis Jasmin",411172:"Gregory Moon",
+  411173:"Jabriece Nicholson",411176:"Jonathan Holman",411177:"Brandon Gaspard",411178:"Tobious Anthony",
+  411180:"Omar Jones",411181:"Darrell Lee",411182:"Sean Buchanan",411183:"Zachary Guffie",
+  411184:"Randall Patterson",411185:"Miguel Rosales",411186:"Christain Welch",411187:"Alexander Tucker",
+  411188:"Rasheen Holton",411189:"Nicholas Todd",411190:"Andrelious Brown",411191:"Fredrick Davis",
+  411192:"Thomas Hayes",411193:"Dana Williams",411194:"Jarrod Coachman",411195:"Jamario Chambers",
+  411196:"Roosevelt Coney",411197:"Kentorius Marks",411198:"Brookston Lemay",411199:"Corey Renfroe",
+  411200:"Bernard Todd",411201:"Mike Franklin",411202:"Tyron Sanders",411203:"Leonte Williams",
+  411205:"Timothy Sherod",411207:"Eric Coverson",411208:"Kamela Robinson",411209:"Leneon Johnson",
+  411211:"Mickel Evans",411212:"Dean Ellis",411213:"Clayton Moreland",411214:"Grant Giles",
+  411216:"Brian Tolbert",411218:"William Chester",411219:"Alterick Lawrence",411222:"John Albritton",
+  411223:"Milton Hall Jr.",411225:"Ricky Roberson",411228:"Michael White",411229:"Wilson Gist",
+  411230:"Marshall Griffin",411232:"Obbie Mallard",411234:"Kenneth Wright",411235:"Marcus Osagie",
+  411236:"Davron Basden",411238:"Delon Roy",411239:"Delange Aupont",411240:"Duanyae Gibson",
+  411241:"Wayne Brown",411245:"Robert McNair",411249:"Antonio White",411252:"Antonie Warner",
+  411253:"Kousemann St. Fort",411256:"Vickie Herring",411258:"Timothy White",411259:"Terence Brown",
+  411260:"Johnnie Mathis",411261:"Cornelis Hunt",411262:"Brittany Demons",411265:"Seth Kono",
+  411267:"Brian Smith",411268:"Derek Lee",411270:"Lavonte Humphrey",411271:"David Johnson",
+  411272:"Destany Drawn",411274:"Donna Wildes",411275:"Steven Davis",411276:"Deseantus Barkley",
+  411277:"James Mcadoo",411278:"Francisco Arroyo-Ordaz",411281:"Johnathan Welch",411283:"Lenford Joshua",
+  411285:"Kenyetta Hines",411286:"Brianna Hutchins",411287:"Michael Brooks",411288:"Alwin DaCosta",
+  411289:"Kirk Manhertz",411290:"Edward Gill",411293:"Canada Turner",411294:"Carlton Tabron",
+  411295:"Rondel Hamilton",411296:"Joriel Battle",411297:"William Lewis",411298:"Carey Foster",
+  411299:"Leroy Burley",411300:"David Carson",411303:"Tatyana Harris",411304:"Bengela Shaw",
+  411305:"Gregory Joachim",411307:"Billie Craft",411308:"Kim Bryant",411309:"Kiesha Gibson",
+  411310:"Donteae Gibson",411311:"Quentin Pittman",411312:"Tracy Brown",411313:"Alexis Brady",
+  411314:"Lee Roberts",411315:"John Puckett",411316:"Arabia Taylor",411317:"Diane Gadison",
+  411318:"King Daniels",411319:"Chenteria Orr",411320:"Jonathan Pettigrew",411321:"Kelvin Bufford",
+  411322:"Joshua Enwright",411323:"Bryan Anthony",411325:"David Mason",411327:"Eric Stovall",
+  411328:"Dimitri Blow",411329:"Daniel Dean",411330:"Raphaiel Miles",411331:"Tessa Roberts",
+  411332:"LaTia Dozier"
+};
+
+document.getElementById('emp-id').addEventListener('input', function() {
+  const id = parseInt(this.value);
+  const resultEl = document.getElementById('id-result');
+  const nameEl = document.getElementById('id-name');
+  if (this.value.length >= 6) {
+    if (employeeNames[id]) {
+      nameEl.textContent = employeeNames[id];
+      resultEl.className = 'id-result show';
+    } else {
+      nameEl.textContent = 'ID not found — will still submit';
+      resultEl.className = 'id-result show error';
+    }
+  } else {
+    resultEl.className = 'id-result';
+  }
+});
+
+function showToast(msg, duration = 3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+async function submitForm() {
+  const empId = document.getElementById('emp-id').value.trim();
+  const shiftStart = document.getElementById('shift-start').value;
+  const notes = document.getElementById('notes').value.trim();
+  const btn = document.getElementById('submit-btn');
+
+  if (!empId) { showToast('⚠️ Please enter your Employee ID'); return; }
+  if (!shiftStart) { showToast('⚠️ Please select your shift start time'); return; }
+  if (!selectedReason) { showToast('⚠️ Please select a reason'); return; }
+
+  const name = employeeNames[parseInt(empId)] || '';
+  const now = new Date();
+  const callOutDate = now.toISOString().split('T')[0];
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Submitting...';
+
+  const payload = {
+    employeeId: parseInt(empId),
+    name: name,
+    reason: selectedReason,
+    callOutDate: callOutDate,
+    shiftStart: shiftStart,
+    note: notes
+  };
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('success-section').classList.add('show');
+  } catch (err) {
+    showToast('❌ Submission failed. Please try again.');
+    btn.disabled = false;
+    btn.innerHTML = 'Submit Call Out';
+  }
+}
+
+function resetForm() {
+  document.getElementById('emp-id').value = '';
+  document.getElementById('shift-start').value = '';
+  document.getElementById('notes').value = '';
+  document.getElementById('id-result').className = 'id-result';
+  document.querySelectorAll('.reason-card').forEach(c => c.classList.remove('selected'));
+  selectedReason = '';
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('submit-btn').innerHTML = 'Submit Call Out';
+  document.getElementById('success-section').classList.remove('show');
+  document.getElementById('form-section').style.display = 'block';
+}
+
+// QR Code
+window.addEventListener('load', () => {
+  const url = window.location.href;
+  document.getElementById('qr-url-text').textContent = url;
+  new QRCode(document.getElementById('qrcode'), {
+    text: url,
+    width: 160,
+    height: 160,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.M
+  });
+});
+</script>
+</body>
+</html>
