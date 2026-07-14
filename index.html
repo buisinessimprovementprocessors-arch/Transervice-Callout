@@ -417,6 +417,20 @@
     </div>
   </div>
 
+  <!-- ===== DRIVER POINTS LOOKUP ===== -->
+  <div id="pointsLookup" style="margin:24px 0;padding:20px;border:1px solid #b08800;border-radius:12px;background:#0d0f14;">
+    <div style="color:#f5c000;font-size:12px;letter-spacing:2px;font-weight:bold;margin-bottom:12px;">CHECK MY POINTS</div>
+    <div style="display:flex;gap:10px;">
+      <input id="lookupId" type="text" inputmode="numeric" placeholder="Employee ID #"
+        style="flex:1;padding:12px;border-radius:8px;border:1px solid #444;background:#1a1d24;color:#fff;font-size:16px;">
+      <button type="button" onclick="lookupPoints()"
+        style="padding:12px 20px;border:none;border-radius:8px;background:#f5c000;color:#0d0f14;font-weight:bold;cursor:pointer;">
+        Look Up
+      </button>
+    </div>
+    <div id="lookupResult" style="margin-top:14px;color:#ffd84a;font-size:15px;min-height:20px;"></div>
+  </div>
+
   <div class="field">
     <label>Additional Notes (Optional)</label>
     <input type="text" id="notes" placeholder="Any additional info...">
@@ -446,6 +460,25 @@
 
 <script>
 const SCRIPT_URL = "https://default3736ba2ab66047748ed80d95976bac.33.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/451eb37a491f4ded949113f634270ad6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EVaUzOTb4Os_EwLIO8uBeVVaNU8tlumtvVDm2zo9uak";
+
+// ===== DRIVER POINTS LOOKUP =====
+const POINTS_FLOW_URL = "https://default3736ba2ab66047748ed80d95976bac.33.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/06/workflows/0c396e1071b946ecab2deefd9cf56c5c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=xIoQiAVcx0JXSEpr3qWaBvNHOttBXS62BVJBASR-daI";
+
+async function lookupPoints() {
+  const id = document.getElementById('lookupId').value.trim();
+  const out = document.getElementById('lookupResult');
+  if (!id) { out.textContent = "Enter your Employee ID."; return; }
+  out.textContent = "Looking up...";
+  try {
+    const res = await fetch(POINTS_FLOW_URL + "&employeeId=" + encodeURIComponent(id));
+    const data = await res.json();
+    if (!data.found) { out.textContent = "No record found for ID " + id + "."; return; }
+    out.textContent = data.name + " \u2014 " + data.points + " point(s)" +
+      (data.action ? " \u00b7 Current level: " + data.action : "");
+  } catch (e) {
+    out.textContent = "Lookup unavailable. Please try again or contact the office.";
+  }
+}
 
 // Clock
 function updateClock() {
