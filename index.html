@@ -365,17 +365,19 @@
     <label>Shift Start Time</label>
     <select id="shift-start">
       <option value="">Select shift time...</option>
-      <option>5:30 AM</option>
-      <option>6:00 AM</option>
-      <option>7:00 AM</option>
-      <option>8:00 AM</option>
-      <option>9:00 AM</option>
-      <option>9:30 AM</option>
-      <option>10:00 AM</option>
-      <option>11:00 AM</option>
-      <option>12:00 PM</option>
-      <option>5:30 PM</option>
-      <option>6:00 PM</option>
+      <option value="00:00">12:00 AM (Midnight)</option>
+      <option value="02:30">2:30 AM</option>
+      <option value="05:30">5:30 AM</option>
+      <option value="07:00">7:00 AM</option>
+      <option value="08:00">8:00 AM</option>
+      <option value="09:00">9:00 AM</option>
+      <option value="10:00">10:00 AM</option>
+      <option value="11:00">11:00 AM</option>
+      <option value="12:00">12:00 PM (Noon)</option>
+      <option value="13:00">1:00 PM</option>
+      <option value="17:30">5:30 PM</option>
+      <option value="19:00">7:00 PM</option>
+      <option value="21:00">9:00 PM</option>
     </select>
   </div>
 
@@ -415,6 +417,18 @@
       <div class="icon">✈️</div>
       <div class="label">Vacation Day</div>
     </div>
+    <div class="reason-card" data-value="Float">
+      <div class="icon">🔄</div>
+      <div class="label">Float</div>
+    </div>
+  </div>
+
+  <!-- ===== CONDITIONAL NOTICES ===== -->
+  <div id="fmlaNotice" style="display:none;margin:14px 0;padding:14px;border-left:4px solid #f5c000;background:#fff8e1;color:#5c4a00;border-radius:8px;font-size:14px;line-height:1.5;">
+    <strong>FMLA Reporting Reminder:</strong> If you are calling out for FMLA, you must report your time by either calling AbsenceResource at <a href="tel:8774623652" style="color:#5c4a00;font-weight:bold;">877-462-3652</a> or using the AbsenceResource app to submit your absence request.
+  </div>
+  <div id="vacationNotice" style="display:none;margin:14px 0;padding:14px;border-left:4px solid #b08800;background:#f4f0e4;color:#4a3d00;border-radius:8px;font-size:14px;line-height:1.5;">
+    <strong>Please note:</strong> Employee vacation requests will be considered; however, operating requirements as determined by the Company will control, per CBA Article 14, Section 4.
   </div>
 
   <!-- ===== DRIVER POINTS LOOKUP ===== -->
@@ -496,73 +510,82 @@ document.querySelectorAll('.reason-card').forEach(card => {
     document.querySelectorAll('.reason-card').forEach(c => c.classList.remove('selected'));
     card.classList.add('selected');
     selectedReason = card.dataset.value;
+    updateNotices(selectedReason);
   });
 });
+
+function updateNotices(reason) {
+  document.getElementById('fmlaNotice').style.display =
+    reason === 'Call out/FMLA' ? 'block' : 'none';
+  document.getElementById('vacationNotice').style.display =
+    reason === 'Vacation Day' ? 'block' : 'none';
+}
 
 // Employee ID lookup
 const employeeNames = {
   411001:"Marty Mosley",411002:"Alfred Hardy",411003:"Milton Hall",411004:"Jimmy Morris",
-  411005:"Curtis Lawrence",411006:"Scott Thompson",411008:"James Harmon",411009:"Kenneth Willis",
-  411013:"Roderick Manning",411014:"Edward Sherrill",411015:"Larry Kendrick",411016:"Von Simmons",
-  411017:"Jasper Porter",411018:"Jim Blackburn",411019:"Terry Johnson",411020:"John Tipton",
-  411022:"Benjamin Tillman",411023:"Terry Saunders",411025:"James Danny Brown",411026:"James Tinch",
-  411027:"Kristopher Carey",411028:"Dwane Landry",411030:"Dennis Morris",411032:"Brett Peace",
-  411034:"Michael Poitier",411036:"Phillip Woodley Jr.",411037:"Albert Head",411038:"Dusko Martinovic",
-  411039:"Tim Ingram",411040:"Eddie Vasquez",411042:"Spencer Williams",411043:"Malcolm Hall",
-  411045:"Todd Swift",411046:"Donnie Smith",411048:"Alfred Dumas",411049:"Dante Relaford",
-  411050:"Willie Blocker",411052:"Gregory Hamilton",411054:"Michael Mason",411056:"Jose Soria",
-  411057:"Joe Law",411058:"Joseph Duffy",411059:"Edward Gresham",411060:"Dwight Gunn",
-  411061:"Ytece Scales",411062:"Jerry Kendall",411063:"Rodriquez Ragland",411064:"Richard Chambers",
-  411065:"Jeffery Brittian",411066:"Christopher Basden",411069:"Steven Lewis",411070:"Hosel Johnson",
-  411071:"Mario Andrews",411072:"Gary Higgins",411073:"Monica McKoy",411077:"Tracy Tift",
-  411078:"Albert Ponder",411079:"Adrienne Bryant",411080:"Robert Couch",411083:"Victor Staples",
-  411086:"Eric Walker",411087:"Michael Calhoun",411088:"Joe Cook",411089:"Darrio Parrish",
-  411090:"Raphael Lucas",411091:"Christopher Hardy",411092:"Ernest McCrary",411093:"Thomas Leverett",
+  411005:"Curtis Lawrence",411006:"Scott Thompson",411007:"Lionel Battle",411008:"James Harmon",
+  411009:"Kenneth Willis",411011:"Joe Robinson",411012:"Tommy Rooks",411013:"Roderick Manning",
+  411014:"Edward Sherrill",411015:"Larry Kendrick",411017:"Jasper Porter",411018:"Jim Blackburn",
+  411019:"Terry Johnson",411020:"John Tipton",411159:"Leslie Lawrence",411022:"Benjamin Tillman",
+  411023:"Terry Saunders",411024:"Jeff Grigsby",411025:"James Danny Brown",411026:"James Tinch",
+  411027:"Kristopher Carey",411030:"Dennis Morris",411154:"Kelvyn Corbett",411031:"Vincent Woods",
+  411157:"Staffon Myers",411034:"Michael Poitier",411035:"Ernestine Putnam",411161:"Wilson Reid",
+  411036:"Phillip Woodley Jr.",411037:"Albert Head",411039:"Tim Ingram",411038:"Dusko Martinovic",
+  411040:"Eddie Vasquez",411041:"Aleksandar Prodanovic",411042:"Spencer Williams",411043:"Malcolm Hall",
+  411044:"Torrey Anderson",411045:"Todd Swift",411156:"Gerald Greene",411046:"Donnie Smith",
+  411048:"Alfred Dumas",411049:"Dante Relaford",411050:"Willie Blocker",411052:"Gregory Hamilton",
+  411054:"Michael Mason",411056:"Jose Soria",411057:"Joe Law",411058:"Joseph Duffy",
+  411059:"Edward Gresham",411061:"Ytece Scales",411062:"Jerry Kendall",411060:"Dwight Gunn",
+  411064:"Richard Chambers",411065:"Jeffery Brittian",411066:"Christopher Basden",411067:"James Parr",
+  411068:"Ryan Lee",411069:"Steven Lewis",411070:"Hosel Johnson",411071:"Mario Andrews",
+  411072:"Gary Higgins",411073:"Monica McKoy",411074:"Anthony Leslie",411075:"Dennis Garner",
+  411077:"Tracy Tift",411078:"Albert Ponder",411079:"Adrienne Bryant",411163:"Robert Cureton",
+  411081:"Michael Porter",411084:"Jerry Young",411080:"Robert Couch",411155:"Bruce Reavis",
+  411087:"Michael Calhoun",411088:"Joe Cook",411089:"Darrio Parrish",411090:"Raphael Lucas",
+  411091:"Christopher Hardy",411092:"Ernest McCrary",411162:"Larry Tanksley",411093:"Thomas Leverett",
   411094:"Timothy Simon",411095:"Randall Murphy",411096:"Robert Whitney",411097:"Mario Searcy",
-  411098:"Robert Farris",411100:"Leslie Kimble",411102:"David Lyons",411103:"Ralph Payton",
-  411106:"Mahmoud Rashad",411107:"Roderick Tucker",411108:"Chris Floyd",411109:"Takelia McCrimon",
-  411110:"Carl Sweat",411111:"Mark Roebuck",411112:"Darell Richson",411113:"Antwann Lewis",
-  411115:"Jean Louis",411116:"Rontavious Patton",411118:"Zacarra Buffington",411121:"John Wesley Yates",
-  411122:"Gene Thompson",411123:"Elom Maglo",411124:"Rodney Bembry",411126:"Alexander Rhodes",
-  411127:"Robert Brewer",411131:"Divid Harris",411133:"Mackenzie Nelson",411134:"Richardson Fils",
+  411252:"Antonie Warner",411098:"Robert Farris",411099:"Laura Poling",411100:"Leslie Kimble",
+  411102:"David Lyons",411103:"Ralph Payton",411104:"Terrian Johnson",411106:"Mahmoud Rashad",
+  411108:"Chris Floyd",411109:"Takelia McCrimon",411110:"Carl Sweat",411111:"Mark Roebuck",
+  411112:"Darell Richson",411113:"Antwann Lewis",411114:"Rohalia Knight",411115:"Jean Louis",
+  411116:"Rontavious Patton",411117:"Terry Montgomery",411118:"Zacarra Buffington",411119:"Travon Hardy",
+  411121:"John Wesley Yates",411122:"Gene Thompson",411123:"Elom Maglo",411124:"Rodney Bembry",
+  411126:"Alexander Rhodes",411127:"Robert Brewer",411129:"Reginald Kenney",411130:"William Anderson",
+  411131:"Divid Harris",411132:"Garry White",411133:"Mackenzie Nelson",411134:"Richardson Fils",
   411135:"Kendall Thomas",411138:"Scott Blankenship",411139:"Jason Hooks",411140:"Laracco Glaze",
-  411141:"Samuel Meeks",411142:"Kenneth Sheriff",411144:"Davon Autry",411146:"Reginald Smith",
-  411149:"Joseph Robinson",411150:"Deion Coston",411151:"Raven Scott",411154:"Kelvyn Corbett",
-  411155:"Bruce Reavis",411156:"Gerald Greene",411157:"Staffon Myers",411159:"Leslie Lawrence",
-  411160:"Marcus Lewis",411161:"Wilson Reid",411162:"Larry Tanksley",411163:"Robert Cureton",
-  411165:"Lonnie Gary",411166:"Bryant Dennis",411167:"Alfred Hill",411168:"Ulysses Gladden",
-  411169:"Kizzy Morris",411170:"Louis Washington",411171:"Louis Jasmin",411172:"Gregory Moon",
-  411173:"Jabriece Nicholson",411176:"Jonathan Holman",411177:"Brandon Gaspard",411178:"Tobious Anthony",
-  411180:"Omar Jones",411181:"Darrell Lee",411182:"Sean Buchanan",411183:"Zachary Guffie",
-  411184:"Randall Patterson",411185:"Miguel Rosales",411186:"Christain Welch",411187:"Alexander Tucker",
-  411188:"Rasheen Holton",411189:"Nicholas Todd",411190:"Andrelious Brown",411191:"Fredrick Davis",
-  411192:"Thomas Hayes",411193:"Dana Williams",411194:"Jarrod Coachman",411195:"Jamario Chambers",
-  411196:"Roosevelt Coney",411197:"Kentorius Marks",411198:"Brookston Lemay",411199:"Corey Renfroe",
-  411200:"Bernard Todd",411201:"Mike Franklin",411202:"Tyron Sanders",411203:"Leonte Williams",
-  411205:"Timothy Sherod",411207:"Eric Coverson",411208:"Kamela Robinson",411209:"Leneon Johnson",
-  411211:"Mickel Evans",411212:"Dean Ellis",411213:"Clayton Moreland",411214:"Grant Giles",
-  411216:"Brian Tolbert",411218:"William Chester",411219:"Alterick Lawrence",411222:"John Albritton",
-  411223:"Milton Hall Jr.",411225:"Ricky Roberson",411228:"Michael White",411229:"Wilson Gist",
-  411230:"Marshall Griffin",411232:"Obbie Mallard",411234:"Kenneth Wright",411235:"Marcus Osagie",
-  411236:"Davron Basden",411238:"Delon Roy",411239:"Delange Aupont",411240:"Duanyae Gibson",
-  411241:"Wayne Brown",411245:"Robert McNair",411249:"Antonio White",411252:"Antonie Warner",
-  411253:"Kousemann St. Fort",411256:"Vickie Herring",411258:"Timothy White",411259:"Terence Brown",
-  411260:"Johnnie Mathis",411261:"Cornelis Hunt",411262:"Brittany Demons",411265:"Seth Kono",
-  411267:"Brian Smith",411268:"Derek Lee",411270:"Lavonte Humphrey",411271:"David Johnson",
-  411272:"Destany Drawn",411274:"Donna Wildes",411275:"Steven Davis",411276:"Deseantus Barkley",
-  411277:"James Mcadoo",411278:"Francisco Arroyo-Ordaz",411281:"Johnathan Welch",411283:"Lenford Joshua",
-  411285:"Kenyetta Hines",411286:"Brianna Hutchins",411287:"Michael Brooks",411288:"Alwin DaCosta",
-  411289:"Kirk Manhertz",411290:"Edward Gill",411293:"Canada Turner",411294:"Carlton Tabron",
-  411295:"Rondel Hamilton",411296:"Joriel Battle",411297:"William Lewis",411298:"Carey Foster",
-  411299:"Leroy Burley",411300:"David Carson",411303:"Tatyana Harris",411304:"Bengela Shaw",
-  411305:"Gregory Joachim",411307:"Billie Craft",411308:"Kim Bryant",411309:"Kiesha Gibson",
-  411310:"Donteae Gibson",411311:"Quentin Pittman",411312:"Tracy Brown",411313:"Alexis Brady",
-  411314:"Lee Roberts",411315:"John Puckett",411316:"Arabia Taylor",411317:"Diane Gadison",
+  411141:"Samuel Meeks",411142:"Kenneth Sheriff",411144:"Davon Autry",411145:"Michael Nicolozzi",
+  411274:"Donna Wildes",411146:"Reginald Smith",411149:"Joseph Robinson",411150:"Deion Coston",
+  411151:"Raven Scott",411152:"Antonio Pittman",411165:"Lonnie Gary",411166:"Bryant Dennis",
+  411167:"Alfred Hill",411168:"Ulysses Gladden",411169:"Kizzy Morris",411170:"Louis Washington",
+  411171:"Louis Jasmin",411172:"Gregory Moon",411173:"Jabriece Nicholson",411174:"Michael Demps",
+  411176:"Jonathan Holman",411177:"Brandon Gaspard",411178:"Tobious Anthony",411181:"Darrell Lee",
+  411180:"Omar Jones",411182:"Sean Buchanan",411183:"Zachary Guffie",411184:"Randall Patterson",
+  411185:"Miguel Rosales",411186:"Christain Welch",411187:"Alexander Tucker",411188:"Rasheen Holton",
+  411189:"Nicholas Todd",411190:"Andrelious Brown",411191:"Fredrick Davis",411192:"Thomas Hayes",
+  411193:"Dana Williams",411194:"Jarrod Coachman",411195:"Jamario Chambers",411196:"Roosevelt Coney",
+  411197:"Kentorius Marks",411198:"Brookston Lemay",411199:"Corey Renfroe",411200:"Bernard Todd",
+  411201:"Mike Franklin",411202:"Tyron Sanders",411203:"Leonte Williams",411207:"Eric Coverson",
+  411208:"Kamela Robinson",411209:"Leneon Johnson",411211:"Mickel Evans",411212:"Dean Ellis",
+  411213:"Clayton Moreland",411214:"Grant Giles",411215:"Jerry Williamson",411216:"Brian Tolbert",
+  411218:"William Chester",411219:"Alterick Lawrence",411222:"John Albritton",411223:"Milton Hall Jr.",
+  411224:"Guy Patterson",411225:"Ricky Roberson",411226:"Reginald Pierre",411227:"Roystan Frederick",
+  411228:"Michael White",411229:"Wilson Gist",411230:"Marshall Griffin",411232:"Obbie Mallard",
+  411233:"Demetrius Seats",411234:"Kenneth Wright",411235:"Marcus Osagie",411236:"Davron Basden",
+  411238:"Delon Roy",411239:"Delange Aupont",411240:"Duanyae Gibson",411249:"Antonio White",
+  411253:"Kousemann St. Fort",411258:"Timothy White",411259:"Terence Brown",411260:"Johnnie Mathis",
+  411261:"Cornelis Hunt",411262:"Brittany Demons",411265:"Seth Kono",411267:"Brian Smith",
+  411268:"Derek Lee",411270:"Lavonte Humphrey",411271:"David Johnson",411272:"Destany Drawn",
+  411275:"Steven Davis",411276:"Deseantus Barkley",411278:"Francisco Arroyo-Ordaz",411281:"Johnathan Welch",
+  411283:"Lenford Joshua",411285:"Kenyetta Hines",411286:"Brianna Hutchins",411287:"Michael Brooks",
+  411289:"Kirk Manhertz",411290:"Edward Gill",411294:"Carlton Tabron",411296:"Joriel Battle",
+  411297:"William Lewis",411298:"Carey Foster",411300:"David Carson",411303:"Tatyana Harris",
+  411304:"Bengela Shaw",411305:"Gregory Joachim",411307:"Billie Craft",411308:"Kim Bryant",
+  411313:"Alexis Brady",411314:"Lee Roberts",411316:"Arabia Taylor",411317:"Diane Gadison",
   411318:"King Daniels",411319:"Chenteria Orr",411320:"Jonathan Pettigrew",411321:"Kelvin Bufford",
   411322:"Joshua Enwright",411323:"Bryan Anthony",411325:"David Mason",411327:"Eric Stovall",
-  411328:"Dimitri Blow",411329:"Daniel Dean",411330:"Raphaiel Miles",411331:"Tessa Roberts",
-  411332:"LaTia Dozier",411333:"James Kitchen",411334:"Tyler Israel",411335:"Gaysha Griffin",
-  411336:"Dan Sanders",411337:"Avery Jones"
+  411328:"Dimitri Blow",411330:"Raphaiel Miles",411332:"LaTia Dozier",411333:"James Kitchen",
+  411334:"Israel Tyler",411335:"Gaysha Griffin",411336:"Dan Sanders",411337:"Avery Jones"
 };
 
 document.getElementById('emp-id').addEventListener('input', function() {
@@ -594,6 +617,7 @@ async function submitForm() {
   const shiftStart = document.getElementById('shift-start').value;
   const notes = document.getElementById('notes').value.trim();
   const btn = document.getElementById('submit-btn');
+  if (btn.disabled) return;  // debounce: ignore double-taps
 
   if (!empId) { showToast('⚠️ Please enter your Employee ID'); return; }
   if (!shiftStart) { showToast('⚠️ Please select your shift start time'); return; }
@@ -637,6 +661,7 @@ function resetForm() {
   document.getElementById('id-result').className = 'id-result';
   document.querySelectorAll('.reason-card').forEach(c => c.classList.remove('selected'));
   selectedReason = '';
+  updateNotices('');
   document.getElementById('submit-btn').disabled = false;
   document.getElementById('submit-btn').innerHTML = 'Submit Call Out';
   document.getElementById('success-section').classList.remove('show');
