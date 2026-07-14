@@ -430,6 +430,9 @@
   <div id="vacationNotice" style="display:none;margin:14px 0;padding:14px;border-left:4px solid #b08800;background:#f4f0e4;color:#4a3d00;border-radius:8px;font-size:14px;line-height:1.5;">
     <strong>Please note:</strong> Employee vacation requests will be considered; however, operating requirements as determined by the Company will control, per CBA Article 14, Section 4.
   </div>
+  <div id="sickNotice" style="display:none;margin:14px 0;padding:14px;border-left:4px solid #f5c000;background:#fff8e1;color:#5c4a00;border-radius:8px;font-size:14px;line-height:1.5;">
+    <strong>Please note:</strong> By selecting Sick Day, you are requesting to use an available sick day.
+  </div>
 
   <!-- ===== DRIVER POINTS LOOKUP ===== -->
   <div id="pointsLookup" style="margin:24px 0;padding:20px;border:1px solid #b08800;border-radius:12px;background:#0d0f14;">
@@ -519,6 +522,8 @@ function updateNotices(reason) {
     reason === 'Call out/FMLA' ? 'block' : 'none';
   document.getElementById('vacationNotice').style.display =
     reason === 'Vacation Day' ? 'block' : 'none';
+  document.getElementById('sickNotice').style.display =
+    reason === 'Sick Day' ? 'block' : 'none';
 }
 
 // Employee ID lookup
